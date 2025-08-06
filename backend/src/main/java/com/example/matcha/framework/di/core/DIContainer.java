@@ -13,6 +13,7 @@ public class DIContainer {
     private final Map<Class<?>, Object> instances = new HashMap<>();
     private final Set<Class<?>> creating = new HashSet<>();
 
+
     public void register(Class<?>... classes) {
         Objects.requireNonNull(classes, "클래스 배열이 null 입니다");
         for (int i = 0; i < classes.length; ++i) {
@@ -39,6 +40,21 @@ public class DIContainer {
             throw new RuntimeException("등록되지 않은 클래스입니다: " + clazz.getName());
         }
         return (T) createInstance(clazz);
+    }
+
+    public boolean isRegistered(Class<?> clazz) {
+        return registeredClasses.contains(clazz);
+    }
+
+    public boolean isRegistered(String beanName) {
+        return registeredClasses.stream()
+                .map(DIContainer::toBeanName)
+                .anyMatch(name -> name.equals(beanName));
+    }
+
+    private static String toBeanName(Class<?> clazz) {
+        String simple = clazz.getSimpleName();
+        return Character.toLowerCase(simple.charAt(0)) + simple.substring(1);
     }
 
     private Object createInstance(Class<?> clazz) {

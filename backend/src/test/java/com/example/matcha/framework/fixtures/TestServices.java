@@ -106,4 +106,7 @@ public class TestServices {
     public static class ServiceA {
         private final SharedDependency sharedDependency;
     }
+
+    public static class OtherService {
+    }
 }

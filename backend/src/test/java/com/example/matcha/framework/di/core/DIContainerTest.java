@@ -1,5 +1,6 @@
 package com.example.matcha.framework.di.core;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -15,6 +16,7 @@ import com.example.matcha.framework.fixtures.TestServices.DeepB;
 import com.example.matcha.framework.fixtures.TestServices.DeepC;
 import com.example.matcha.framework.fixtures.TestServices.DeepD;
 import com.example.matcha.framework.fixtures.TestServices.DeepE;
+import com.example.matcha.framework.fixtures.TestServices.OtherService;
 import com.example.matcha.framework.fixtures.TestServices.ServiceA;
 import com.example.matcha.framework.fixtures.TestServices.ServiceB;
 import com.example.matcha.framework.fixtures.TestServices.ServiceNeedingDependency;
@@ -144,8 +146,6 @@ class DIContainerTest {
         RuntimeException exception = assertThrows(RuntimeException.class, c::initialize);
 
         assertTrue(exception.getMessage().contains("빈 생성 실패"));
-
-
     }
 
     @Test
@@ -221,6 +221,26 @@ class DIContainerTest {
         ServiceB serviceB = c.getBean(ServiceB.class);
 
         assertSame(serviceA.getSharedDependency(), serviceB.getSharedDependency());
+    }
+
+    @Test
+    @DisplayName("isRegistered(Class): 등록된 클래스에 대해 true를 반환해야 한다")
+    void isRegisteredByType() {
+        DIContainer c = new DIContainer();
+        c.register(SimpleService.class);
+
+        assertTrue(c.isRegistered(SimpleService.class));
+        assertFalse(c.isRegistered(OtherService.class));
+    }
+
+    @Test
+    @DisplayName("isRegistered(String): 빈 이름으로도 조회가 가능해야 한다")
+    void isRegisteredByString() {
+        DIContainer c = new DIContainer();
+        c.register(SimpleService.class);
+
+        assertTrue(c.isRegistered("simpleService"));
+        assertFalse(c.isRegistered("unknownBean"));
     }
 }
 
