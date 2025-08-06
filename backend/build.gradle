@@ -1,0 +1,100 @@
+plugins {
+	id 'java'
+	id 'application'
+	id 'com.github.johnrengelman.shadow' version '8.1.1'  // Fat-Jar 생성용
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Lombok - 메인 + 테스트
+	compileOnly           'org.projectlombok:lombok:1.18.38'
+	annotationProcessor   'org.projectlombok:lombok:1.18.38'
+	testCompileOnly       'org.projectlombok:lombok:1.18.38'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
+
+	// MySQL 드라이버
+	runtimeOnly 'com.mysql:mysql-connector-j:8.2.0'
+
+	// Spark 웹 프레임워크
+	implementation 'com.sparkjava:spark-core:2.9.4'
+
+	// Jackson - BOM 사용으로 버전 관리 개선
+	implementation platform('com.fasterxml.jackson:jackson-bom:2.15.2')
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'com.fasterxml.jackson.core:jackson-core'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+	// 🔒 JWT - BOM 사용으로 버전 관리
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+	// 비밀번호 해싱
+	implementation 'org.mindrot:jbcrypt:0.4'
+
+	// 💾 데이터베이스 & 캐시
+	implementation 'com.zaxxer:HikariCP:5.0.1'
+	implementation 'redis.clients:jedis:6.1.0'
+
+	// 📧 이메일 - activation 의존성 추가로 안정성 확보
+	implementation 'javax.mail:javax.mail-api:1.6.2'
+	implementation 'com.sun.mail:javax.mail:1.6.2'
+	implementation 'javax.activation:activation:1.1.1'
+
+	// 📁 파일 업로드 (프로필 사진)
+	implementation 'commons-fileupload:commons-fileupload:1.5'
+	implementation 'commons-io:commons-io:2.14.0'
+	implementation 'org.imgscalr:imgscalr-lib:4.2'
+
+	// 🔍 DI 구현용 (클래스 스캐닝)
+	implementation 'org.reflections:reflections:0.10.2'
+
+	// 🌐 WebSocket (실시간 채팅)
+	implementation 'org.java-websocket:Java-WebSocket:1.5.3'
+
+	// 🛡️ 보안 유틸리티
+	implementation 'org.owasp.encoder:encoder:1.2.3'
+
+	// 🧪 테스트 - 단순화
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+	testImplementation 'org.mockito:mockito-core:5.5.0'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+application {
+	mainClass = 'com.example.matcha.MatchaApplication'
+}
+
+// Shadow JAR 설정 (배포용 Fat-Jar)
+shadowJar {
+	archiveBaseName = 'web-matcha'
+	archiveClassifier = ''
+	mergeServiceFiles()
+
+	// 메인 클래스 설정
+	manifest {
+		attributes 'Main-Class': 'com.example.matcha.MatchaApplication'
+	}
+}
