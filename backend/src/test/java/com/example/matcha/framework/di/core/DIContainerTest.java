@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.example.matcha.framework.fixtures.TestServices;
 import com.example.matcha.framework.fixtures.TestServices.A;
 import com.example.matcha.framework.fixtures.TestServices.B;
 import com.example.matcha.framework.fixtures.TestServices.C;
@@ -217,8 +218,7 @@ class DIContainerTest {
         c.register(ServiceA.class, ServiceB.class, SharedDependency.class);
         c.initialize();
 
-        ServiceA serviceA = c.getBean(ServiceA.class);
-        ServiceB serviceB = c.getBean(ServiceB.class);
+        ServiceA serviceA = c.getBean(ServiceA.class); ServiceB serviceB = c.getBean(ServiceB.class);
 
         assertSame(serviceA.getSharedDependency(), serviceB.getSharedDependency());
     }
@@ -232,15 +232,25 @@ class DIContainerTest {
         assertTrue(c.isRegistered(SimpleService.class));
         assertFalse(c.isRegistered(OtherService.class));
     }
-
+    
     @Test
     @DisplayName("isRegistered(String): 빈 이름으로도 조회가 가능해야 한다")
     void isRegisteredByString() {
         DIContainer c = new DIContainer();
         c.register(SimpleService.class);
-
+        
         assertTrue(c.isRegistered("simpleService"));
         assertFalse(c.isRegistered("unknownBean"));
+    }
+
+    @Test
+    @DisplayName("register(String, Class): 명시적 빈 이름으로 등록할 수 있다")
+    void register_withBeanName_shouldRegisterWithExplicitName() {
+        DIContainer c = new DIContainer();
+        c.register("myCustomBean", TestServices.class);
+
+        assertTrue(c.isRegistered("myCustomBean"), "명시적 빈 이름으로 등록되어야 한다");
+        assertTrue(c.isRegistered(TestServices.class));
     }
 }
 

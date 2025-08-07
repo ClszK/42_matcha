@@ -11,16 +11,27 @@ import java.util.Set;
 public class DIContainer {
     private final Set<Class<?>> registeredClasses = new HashSet<>();
     private final Map<Class<?>, Object> instances = new HashMap<>();
+    private final Map<String, Class<?>> beanNameToClass = new HashMap<>();
     private final Set<Class<?>> creating = new HashSet<>();
 
 
     public void register(Class<?>... classes) {
         Objects.requireNonNull(classes, "클래스 배열이 null 입니다");
-        for (int i = 0; i < classes.length; ++i) {
-            Objects.requireNonNull(classes[i],
-                    String.format("인덱스 %d의 클래스가 null 입니다", i));
+        for (Class<?> clazz : classes) {
+            Objects.requireNonNull(clazz, "클래스가 null 입니다");
+            registeredClasses.add(clazz);
+
+            String defaultBeanName = toBeanName(clazz);
+            beanNameToClass.put(defaultBeanName, clazz);
         }
-        Collections.addAll(registeredClasses, classes);
+    }
+
+    public void register(String beanName, Class<?> clazz) {
+        Objects.requireNonNull(beanName, "빈 이름이 null 입니다");
+        Objects.requireNonNull(clazz, "클래스가 null 입니다");
+
+        registeredClasses.add(clazz);
+        beanNameToClass.put(beanName, clazz);
     }
 
     public void initialize() {
@@ -47,9 +58,7 @@ public class DIContainer {
     }
 
     public boolean isRegistered(String beanName) {
-        return registeredClasses.stream()
-                .map(DIContainer::toBeanName)
-                .anyMatch(name -> name.equals(beanName));
+        return beanNameToClass.containsKey(beanName);
     }
 
     private static String toBeanName(Class<?> clazz) {
