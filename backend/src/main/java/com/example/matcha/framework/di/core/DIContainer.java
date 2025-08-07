@@ -41,6 +41,7 @@ public class DIContainer {
 
     @SuppressWarnings("unchecked")
     public <T> T getBean(Class<T> clazz) {
+        Objects.requireNonNull(clazz, "클래스가 null 입니다");
         Object instance = instances.get(clazz);
         if (instance != null) {
             return (T) instance;

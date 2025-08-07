@@ -1,9 +1,9 @@
 package com.example.matcha.framework.di.core;
 
-import com.example.matcha.framework.di.annotaion.Component;
-import com.example.matcha.framework.di.annotaion.Repository;
-import com.example.matcha.framework.di.annotaion.RestController;
-import com.example.matcha.framework.di.annotaion.Service;
+import com.example.matcha.framework.di.annotation.Component;
+import com.example.matcha.framework.di.annotation.Repository;
+import com.example.matcha.framework.di.annotation.RestController;
+import com.example.matcha.framework.di.annotation.Service;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashSet;

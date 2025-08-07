@@ -1,4 +1,4 @@
-package com.example.matcha.framework.di.annotaion;
+package com.example.matcha.framework.di.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

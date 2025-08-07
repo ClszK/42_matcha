@@ -1,6 +1,6 @@
 package com.example.matcha.framework.fixtures;
 
-import com.example.matcha.framework.di.annotaion.Component;
+import com.example.matcha.framework.di.annotation.Component;
 import lombok.RequiredArgsConstructor;
 
 @Component

@@ -218,7 +218,8 @@ class DIContainerTest {
         c.register(ServiceA.class, ServiceB.class, SharedDependency.class);
         c.initialize();
 
-        ServiceA serviceA = c.getBean(ServiceA.class); ServiceB serviceB = c.getBean(ServiceB.class);
+        ServiceA serviceA = c.getBean(ServiceA.class);
+        ServiceB serviceB = c.getBean(ServiceB.class);
 
         assertSame(serviceA.getSharedDependency(), serviceB.getSharedDependency());
     }
@@ -232,13 +233,13 @@ class DIContainerTest {
         assertTrue(c.isRegistered(SimpleService.class));
         assertFalse(c.isRegistered(OtherService.class));
     }
-    
+
     @Test
     @DisplayName("isRegistered(String): 빈 이름으로도 조회가 가능해야 한다")
     void isRegisteredByString() {
         DIContainer c = new DIContainer();
         c.register(SimpleService.class);
-        
+
         assertTrue(c.isRegistered("simpleService"));
         assertFalse(c.isRegistered("unknownBean"));
     }
