@@ -1,45 +1,40 @@
 package com.example.matcha.framework.di.core;
 
 import com.example.matcha.framework.di.annotation.Component;
-import com.example.matcha.framework.di.annotation.Repository;
-import com.example.matcha.framework.di.annotation.RestController;
-import com.example.matcha.framework.di.annotation.Service;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.reflections.Reflections;
 
 @Slf4j
 @RequiredArgsConstructor
 public class ComponentScanner {
     private final DIContainer container;
-    private final Reflections reflections;
-
-    // 구현한 애노테이션 여기다가 하나씩 추가
-    private static final Map<Class<? extends Annotation>, ValueExtractor<?>> VALUE_EXTRACTORS = Map.of(
-            Component.class, (Component c) -> c.value(),
-            Service.class, (Service s) -> s.value(),
-            Repository.class, (Repository r) -> r.value(),
-            RestController.class, (RestController rc) -> rc.value()
-    );
+    private final ScanResult scanResult;
 
     public ComponentScanner(DIContainer container, String basePackage) {
-        this(container, new Reflections(basePackage));
+        this(container, new ClassGraph()
+                .enableClassInfo()
+                .enableAnnotationInfo()
+                .acceptPackages(basePackage)
+                .scan()
+        );
     }
 
     public void scan() {
-        Set<Class<?>> allComponentClasses = new LinkedHashSet<>();
-        for (Class<? extends Annotation> annotation : VALUE_EXTRACTORS.keySet()) {
-            Set<Class<?>> classes = reflections.getTypesAnnotatedWith(annotation);
-            allComponentClasses.addAll(classes);
-        }
+        Set<Class<?>> candidates = new LinkedHashSet<>();
+
+        // 1) @Component 직접 붙은 클래스
+        scanResult.getClassesWithAnnotation(Component.class.getName())
+                .forEach(ci -> candidates.add(ci.loadClass()));
 
         // 찾은 클래스들을 등록
-        for (Class<?> clazz : allComponentClasses) {
+        for (Class<?> clazz : candidates) {
             try {
                 registerComponent(clazz);
             } catch (Exception ex) {
@@ -67,19 +62,21 @@ public class ComponentScanner {
         log.info("등록된 빈: {} -> {}", beanName, clazz.getName());
     }
 
-    @SuppressWarnings("unchecked")
     private String extractBeanNameFromAnyAnnotation(Class<?> clazz) {
-        for (Class<? extends Annotation> annotationType : VALUE_EXTRACTORS.keySet()) {
-            if (clazz.isAnnotationPresent(annotationType)) {
-                ValueExtractor extractor = VALUE_EXTRACTORS.get(annotationType);
-                return extractor.extractValue(clazz.getAnnotation(annotationType));
+        for (Annotation ann : clazz.getAnnotations()) {
+            Class<? extends Annotation> annType = ann.annotationType();
+
+            try {
+                Method valueMethod = annType.getMethod("value");
+                Object value = valueMethod.invoke(ann);
+                if (value instanceof String str && !str.isBlank()) {
+                    return str;
+                }
+            } catch (NoSuchMethodException e) {
+            } catch (ReflectiveOperationException e) {
+                log.warn("애노테이션 값 추출 실패: {}", annType.getName(), e);
             }
         }
         return "";
     }
-}
-
-@FunctionalInterface
-interface ValueExtractor<T extends Annotation> {
-    String extractValue(T annotation);
 }
