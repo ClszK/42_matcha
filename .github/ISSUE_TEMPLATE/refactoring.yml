@@ -1,5 +1,5 @@
 name: "♻️ Refactoring"
-description: "코드 구조 개선, 중복 제거, 가독성 향상 등의 리팩토링 작업을 기록합니다."
+description: "코드 구조 개선, 중복 제거, 가독성 향상 등의 리팩토링 작업"
 title: "[BE] [FE] Refactor : {간단한 변경 요약}"
 labels: ["refactor", "tech-debt"]
 assignees: []
@@ -8,40 +8,51 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## 🛠 Refactoring
-        이 이슈는 기능 추가/변경이 아닌 코드 품질 향상을 목적으로 합니다.
+        ## ♻️ Refactoring Issue Form
+        기능 변경이 아닌 **코드 품질 개선** 목적의 이슈를 작성합니다.  
+        아래 항목을 순서대로 작성해주세요.
+
+        ---
+        **🛠️ 작성 가이드**
+        - ✅ **필수** 항목은 반드시 작성
+        - 📌 관련 이슈/PR 번호가 있다면 연결
+        - 🛡️ 변경 후 **기존 기능 정상 동작** 테스트 필수
+        ---
 
   - type: textarea
     id: background
     attributes:
-      label: 변경 배경 / 필요성
-      description: 왜 이 리팩토링이 필요한지 설명하세요.
+      label: "💡 변경 배경 / 필요성 (Why)"
+      description: 왜 이 리팩토링이 필요한지 작성해주세요.
       placeholder: |
+        예시:
         - 특정 모듈의 코드 중복이 많음
         - 네이밍 규칙이 일관되지 않음
-        - 유지보수성을 높이기 위함
+        - 유지보수성 향상 필요
     validations:
       required: true
 
   - type: textarea
     id: scope
     attributes:
-      label: 리팩토링 범위
-      description: 이번 리팩토링에서 영향을 받는 모듈/클래스/파일을 나열하세요.
+      label: "📦 리팩토링 범위 (Scope)"
+      description: 영향을 받는 모듈/클래스/파일을 나열해주세요.
       placeholder: |
-        - `UserService`
-        - `OrderRepository`
+        예시:
+        - UserService
+        - OrderRepository
     validations:
       required: true
 
   - type: textarea
     id: approach
     attributes:
-      label: 개선 방향 / 접근 방법
-      description: 리팩토링을 어떤 방식으로 진행할 계획인지 설명하세요.
+      label: "🧭 개선 방향 / 접근 방법 (How)"
+      description: 어떤 방식으로 리팩토링할 계획인지 작성해주세요.
       placeholder: |
+        예시:
         - 메서드 추출(Extract Method)
-        - 변수 네이밍 변경
+        - 변수/메서드 네이밍 변경
         - 공통 유틸로 로직 이동
     validations:
       required: true
@@ -49,18 +60,19 @@ body:
   - type: textarea
     id: risks
     attributes:
-      label: 리스크 및 영향도
-      description: 예상되는 문제나 주의사항을 작성하세요.
+      label: "⚠️ 리스크 및 영향도"
+      description: 예상되는 문제나 주의사항을 작성해주세요.
       placeholder: |
-        - 관련 단위 테스트 필요
-        - 특정 모듈의 의존성 변경으로 인한 영향 가능성
+        예시:
+        - 의존성 변경으로 인한 모듈 간 영향 가능성
+        - 성능 저하 가능성
     validations:
       required: false
 
   - type: textarea
     id: checklist
     attributes:
-      label: 체크리스트
+      label: "✅ 체크리스트"
       description: 리팩토링 완료 전 확인할 항목
       value: |
         - [ ] 기존 기능이 정상 동작하는지 테스트
