@@ -15,30 +15,27 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ComponentScanner {
     private final DIContainer container;
-    private final ScanResult scanResult;
-
-    public ComponentScanner(DIContainer container, String basePackage) {
-        this(container, new ClassGraph()
-                .enableClassInfo()
-                .enableAnnotationInfo()
-                .acceptPackages(basePackage)
-                .scan()
-        );
-    }
+    private final String basePackage;
 
     public void scan() {
-        Set<Class<?>> candidates = new LinkedHashSet<>();
+        try (
+                ScanResult scanResult = new ClassGraph()
+                        .enableClassInfo()
+                        .enableAnnotationInfo()
+                        .acceptPackages(basePackage)
+                        .scan();
+        ) {
+            Set<Class<?>> candidates = new LinkedHashSet<>();
+            scanResult.getClassesWithAnnotation(Component.class.getName())
+                    .forEach(ci -> candidates.add(ci.loadClass()));
 
-        // 1) @Component 직접 붙은 클래스
-        scanResult.getClassesWithAnnotation(Component.class.getName())
-                .forEach(ci -> candidates.add(ci.loadClass()));
-
-        // 찾은 클래스들을 등록
-        for (Class<?> clazz : candidates) {
-            try {
-                registerComponent(clazz);
-            } catch (Exception ex) {
-                log.warn("컴포넌트 등록 중 오류 ({}): {}", clazz.getName(), ex.getMessage(), ex);
+            // 찾은 클래스들을 등록
+            for (Class<?> clazz : candidates) {
+                try {
+                    registerComponent(clazz);
+                } catch (Exception ex) {
+                    log.warn("컴포넌트 등록 중 오류 ({}): {}", clazz.getName(), ex.getMessage(), ex);
+                }
             }
         }
     }
